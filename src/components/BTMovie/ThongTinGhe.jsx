@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
 
-export default class ThongTinGhe extends Component {
+class ThongTinGhe extends Component {
     render() {
         return (
             <div>
@@ -13,26 +14,33 @@ export default class ThongTinGhe extends Component {
                 </div>
 
                 <div className='mt-5'>
-                    <table class="table" border={2}>
+                    <table className='table' border={2}>
                         <thead>
                             <tr className='text-light' style={{ fontSize: '25px' }} >
                                 <th>Số ghế</th>
-                                <th>Giá</th>
+                                <th>Giá </th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr  >
-                                <th>Số ghế</th>
-                                <th>Giá</th>
-                                <th></th>
-                            </tr>
-                            <tr  >
-                                <th>Số ghế</th>
-                                <th>Giá</th>
-                                <th></th>
-                            </tr>
+                            {this.props.danhSachGheDangDat.map((gheDangDat) => {
+                                return <tr key={gheDangDat.soGhe} className="text-light">
+                                    <td>{gheDangDat.soGhe}</td>
+                                    <td>{(gheDangDat.gia).toLocaleString()}</td>
+                                    <td>
+                                        <button onClick={() => { this.props.huyGhe(gheDangDat.soGhe) }} className="btn btn-danger">Hủy</button>
+                                    </td>
+                                </tr>
+                            })}
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colSpan={2} className='text-success'>Tổng tiền</td>
+                                <td className='text-warning'> {(this.props.danhSachGheDangDat.reduce((sum, item) => {
+                                    return sum += item.gia
+                                }, 0)).toLocaleString()+'đ'}</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -40,3 +48,23 @@ export default class ThongTinGhe extends Component {
         )
     }
 }
+
+
+const mapStataToProps = state => {
+    return {
+        danhSachGheDangDat: state.baiTapMovie.danhSachGheDangDat,
+
+    }
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+        huyGhe: (soghe) => {
+            dispatch({
+                type: 'HUY_GHE',
+                payload: soghe
+            })
+        },
+
+    }
+}
+export default connect(mapStataToProps, mapDispatchToProps)(ThongTinGhe)
